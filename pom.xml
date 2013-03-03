@@ -1,0 +1,54 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.rhsummit.jbw13</groupId>
+	<artifactId>vandelay</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	<name>JBoss World '13 - Vandelay</name>
+	<description>Driving the modern business through process management and JBoss BRMS</description>
+	<developers>
+		<developer>
+			<name>Andrew Block</name>
+		</developer>
+		<developer>
+			<name>Emily Brand</name>
+		</developer>
+	</developers>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<slf4j.version>1.6.2</slf4j.version>
+		<cdi.version>1.0-SP4</cdi.version>
+		<jboss.jaxrs.version>1.0.1.Final</jboss.jaxrs.version>
+	</properties>
+
+
+	<build>
+
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<configuration>
+						<source>1.6</source>
+						<target>1.6</target>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+
+	</build>
+
+	<modules>
+		<module>app</module>
+		<module>drools</module>
+		<module>errai</module>
+		<module>jbpm</module>
+		<module>model</module>
+		<module>rest</module>
+		<module>rest-api</module>
+	</modules>
+
+</project>

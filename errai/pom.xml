@@ -1,0 +1,219 @@
+<project xmlns="fhttp://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<artifactId>vandelay</artifactId>
+		<groupId>com.rhsummit.jbw13</groupId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
+	<artifactId>vandelay-errai</artifactId>
+	<packaging>war</packaging>
+
+	<name>JBoss World '13 - Vandelay - Errai</name>
+
+	<properties>
+		<errai.version>2.2.0.Final</errai.version>
+		<gwt.version>2.4.0</gwt.version>
+		<resteasy.version>2.3.5.Final</resteasy.version>
+	</properties>
+
+
+	<dependencies>
+		<!-- Project Dependencies -->
+		<dependency>
+			<groupId>org.jboss.errai</groupId>
+			<artifactId>errai-common</artifactId>
+			<version>${errai.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jboss.errai</groupId>
+			<artifactId>errai-bus</artifactId>
+			<version>${errai.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jboss.errai</groupId>
+			<artifactId>errai-ioc</artifactId>
+			<version>${errai.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jboss.errai</groupId>
+			<artifactId>errai-tools</artifactId>
+			<version>${errai.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jboss.errai</groupId>
+			<artifactId>errai-jaxrs-client</artifactId>
+			<version>${errai.version}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jboss.errai</groupId>
+			<artifactId>errai-jaxrs-provider</artifactId>
+			<version>${errai.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.enterprise</groupId>
+			<artifactId>cdi-api</artifactId>
+			<version>${cdi.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.google.gwt</groupId>
+			<artifactId>gwt-user</artifactId>
+			<scope>provided</scope>
+			<version>${gwt.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>${slf4j.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.rhsummit.jbw13</groupId>
+			<artifactId>vandelay-rest-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.rhsummit.jbw13</groupId>
+			<artifactId>vandelay-model</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	<dependency>
+          <groupId>org.jboss.resteasy</groupId>
+          <artifactId>resteasy-jaxrs</artifactId>
+          <version>${resteasy.version}</version>
+          <scope>provided</scope>
+        </dependency>
+        
+        <!-- Include Sources to make GWT Happy -->
+		<dependency>
+			<groupId>com.rhsummit.jbw13</groupId>
+			<artifactId>vandelay-rest-api</artifactId>
+			<version>${project.version}</version>
+			<classifier>sources</classifier>
+		</dependency>
+		<dependency>
+			<groupId>com.rhsummit.jbw13</groupId>
+			<artifactId>vandelay-model</artifactId>
+			<version>${project.version}</version>
+			<classifier>sources</classifier>
+		</dependency>
+
+	</dependencies>
+
+	<build>
+
+
+		<plugins>
+
+			<plugin>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>2.1.1</version>
+				<configuration>
+					<warName>${project.artifactId}</warName>
+					<outputFileNameMapping>@{artifactId}@-@{baseVersion}@@{dashClassifier?}@.@{extension}@
+					</outputFileNameMapping>
+					<packagingExcludes>**/javax/**/*.*,**/client/local/**/*.class
+					</packagingExcludes>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<artifactId>maven-clean-plugin</artifactId>
+				<version>2.4.1</version>
+				<configuration>
+					<filesets>
+						<fileset>
+							<directory>src/main/webapp/</directory>
+							<includes>
+								<include>WEB-INF/classes/**</include>
+								<include>WEB-INF/lib/**</include>
+								<include>WEB-INF/deploy/**</include>
+								<include>App/**</include>
+								<include>*.JUnit/**</include>
+							</includes>
+							<followSymlinks>false</followSymlinks>
+						</fileset>
+						<fileset>
+							<directory>target</directory>
+							<followSymlinks>false</followSymlinks>
+						</fileset>
+						<fileset>
+							<directory>.errai</directory>
+							<followSymlinks>false</followSymlinks>
+						</fileset>
+					</filesets>
+				</configuration>
+			</plugin>
+
+			<!-- Tests are skipped by default because they require additional GWT 
+				dependencies. Run mvn with -Pintegration-test to enable testing. -->
+			<plugin>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.5</version>
+				<configuration>
+					<skipTests>true</skipTests>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>gwt-maven-plugin</artifactId>
+				<version>${gwt.version}</version>
+				<configuration>
+					<logLevel>INFO</logLevel>
+					<runTarget>Vandelay-RHSummit.html</runTarget>
+					<extraJvmArgs>-Xmx512m</extraJvmArgs>
+					<hostedWebapp>src/main/webapp/</hostedWebapp>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>resources</goal>
+							<goal>compile</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+
+
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>org.codehaus.mojo</groupId>
+										<artifactId>gwt-maven-plugin</artifactId>
+										<versionRange>[2.3.0,)</versionRange>
+										<goals>
+											<goal>resources</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<execute />
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+
+	</build>
+
+</project>

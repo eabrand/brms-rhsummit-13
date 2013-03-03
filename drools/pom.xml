@@ -1,0 +1,11 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>vandelay-drools</artifactId>
+  <name>JBoss World '13 - Vandelay - Drools</name>
+  <description>Drools Integration</description>
+  <parent>
+  	<groupId>com.rhsummit.jbw13</groupId>
+  	<artifactId>vandelay</artifactId>
+  	<version>0.0.1-SNAPSHOT</version>
+  </parent>
+</project>
