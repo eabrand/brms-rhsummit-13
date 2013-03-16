@@ -1,0 +1,200 @@
+package com.rhsummit.jbw13.vandelay.drools
+
+import com.rhsummit.jbw13.vandelay.model.Order
+import com.rhsummit.jbw13.vandelay.model.Product
+import com.rhsummit.jbw13.vandelay.model.Promo
+import com.rhsummit.jbw13.vandelay.model.Discount
+import com.rhsummit.jbw13.vandelay.model.DiscountType
+import com.rhsummit.jbw13.vandelay.model.ExtraCharge
+import com.rhsummit.jbw13.vandelay.model.Customer
+import java.math.BigDecimal
+import java.util.ArrayList
+import java.util.Date
+
+
+############# Create Initial Values ###################
+# First, calculate the subtotal of the order
+	rule "Calculate Subtotal"
+	dialect "mvel"
+	salience 150
+	no-loop true
+	when
+		$order : Order()
+		$sum : Number( )
+            from accumulate(Product($amount : price) from $order.products,
+               sum($amount))			
+	then
+		modify($order) {
+			setSubtotal($sum)
+		}
+		
+	end
+
+	# Set Default Shipping  
+	rule "Default Shipping of $5"
+	dialect "mvel"	
+	salience 149
+	no-loop true
+	when
+		$order: Order(shipping == null)
+	then
+		$order.setShipping(5)
+	end
+############ End Initial Values ####################
+
+
+# Calculate Tax if applicable  
+	rule "7.5% Tax on Subtotal"
+	dialect "mvel"	
+	no-loop true
+	when
+		$order: Order(state == "AZ" || state == "CA" || state == "KS" || state == "KY" || state == "ND" || state == "NY" || state == "PA" || state == "TX" || state == "WA")
+	then
+		$order.setTax($order.getSubtotal() * 0.075);
+	end
+	
+	
+	
+########## Free Shipping Rules ##############
+
+	rule "Free Shipping on Orders Greater than $50"
+	dialect "mvel"
+	salience 100
+	when 
+		$order : Order(eval(subtotal > 50))
+	then
+		$order.setShipping(0)
+	end
+	
+	rule "Free Shipping if Customer has Current Subscription"
+	dialect "mvel"
+	salience -90
+	no-loop true
+	lock-on-active
+	when
+		$order: Order()
+		Customer(subscriptionExpiration > new Date()) from $order.customer
+	then
+		modify($order) {
+			setShipping(0)
+		}
+	end
+	
+	rule "Charge $10 for each Rush Shipping"
+	dialect "mvel"
+	salience -100
+	when
+		$order : Order(rushShipping == true, shipping != 0)
+		not (ExtraCharge (name == "Rush Shipping") from $order.extraCharges)
+	then
+		System.out.println("Charging 10 for rush shipping")
+		modify($order) {
+			getExtraCharges().add(new ExtraCharge("Rush Shipping",10))
+		}
+	end
+
+############ End Shipping Rules ###############
+
+
+########### Begin Promo Rules ###########
+
+	rule "Promo Code BRMS"
+	dialect "mvel"
+	when
+		$order : Order($promos : promos)
+		Promo(code == "BRMS") from $promos
+		not (Discount(name == "BRMS Discount") from $order.discounts)
+	then
+		System.out.println("Promo Code BRMS")
+		modify($order) {
+			getDiscounts().add(new Discount("BRMS Discount",20, DiscountType.PERCENT))
+		}
+	end
+	
+	rule "Promo Code RHSUMMIT"
+	dialect "mvel"
+	when
+		$order : Order($promos : promos)
+		Promo(code == "RHSUMMIT") from $promos
+		not (Discount(name == "RHSUMMIT Discount") from $order.discounts)
+	then
+		System.out.println("Promo Code RHSUMMIT")
+		modify($order) {
+			getDiscounts().add(new Discount("RHSUMMIT Discount",10, DiscountType.PERCENT)),
+			setShipping(0)
+		}
+	end
+	
+########### End Promo Rules ###########
+
+########### Begin Extra Charges ###########
+	
+	
+	rule "Charge $10 for each Overweight Item (over 50lbs)"
+	dialect "mvel"
+	when
+		$order : Order($products : products)
+		$product : Product(weightLbs > 50) from $products
+		not (ExtraCharge(name == "Overweight Item: " + $product.getName()) from $order.extraCharges)
+	then
+		modify($order) {
+			getExtraCharges.add(new ExtraCharge("Overweight Item: " + $product.getName(), 10))
+		}
+	end
+	
+	
+########### End Extra Charges ###########
+	
+	
+	
+################################ Totals ######################################
+
+	rule "Calculate Total"
+	dialect "mvel"
+	salience -150
+	no-loop true
+	when
+		$order : Order()
+		$charges : Number( )
+            from accumulate(ExtraCharge($amount : amount) from $order.getExtraCharges(),
+               sum($amount))			
+		
+	then
+		$order.setTotal($order.getSubtotal() + $order.getShipping() + $order.getTax() + $charges)	
+		System.out.println("The Subtotal is: "+ $order.getSubtotal());
+		System.out.println("The Shipping total is: "+$order.getShipping())
+		System.out.println("The Tax total is: "+$order.getTax())
+		System.out.println("The Grand Total is: "+ $order.getTotal())
+		System.out.println("The Extra Charges is: "+$charges)
+	end
+
+
+
+	rule "Calculate Final Percentage Totals"
+	dialect "mvel"
+	salience -200
+	no-loop true
+	when
+		$order : Order()
+		$discountPercentage : Number(intValue > 0)
+              from accumulate( d : Discount( discountType == DiscountType.PERCENT) from $order.getDiscounts(), max(d.amount))
+			
+	then
+		$order.setTotal($order.getTotal() - ($order.getTotal() * ($discountPercentage/100)))		
+		System.out.println("Final Total: "+$order.getTotal());
+	end
+	
+	
+############ TODO: Calculate Discounts for Number of Similar Items in Order ################
+
+#	rule "Similar Items"
+#	dialect "mvel"
+#	salience -100
+#	no-loop true
+#	when
+#		$order : Order()
+#		$count : Number() from accumulate (Product() from $order.products, count(1))
+#	then
+#		System.out.println("Woot: "+$count);
+#	end
+

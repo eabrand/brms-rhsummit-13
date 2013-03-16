@@ -8,4 +8,63 @@
   	<artifactId>vandelay</artifactId>
   	<version>0.0.1-SNAPSHOT</version>
   </parent>
+  
+	
+	<dependencies>
+		<dependency>
+			<groupId>org.drools</groupId>
+			<artifactId>drools-core</artifactId>
+			<version>${brms.version}</version>
+			<scope>test</scope>
+		</dependency>
+	<dependency>	
+			<groupId>org.drools</groupId>
+			<artifactId>drools-compiler</artifactId>
+			<version>${brms.version}</version>
+			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+          <groupId>org.drools</groupId>
+          <artifactId>knowledge-api</artifactId>
+          <version>${brms.version}</version>
+          <scope>test</scope>
+        </dependency>
+		
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>${junit.version}</version>
+			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.mvel</groupId>
+			<artifactId>mvel2</artifactId>
+			<version>2.1.0.drools16</version>
+			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.eclipse.jdt.core.compiler</groupId>
+			<artifactId>ecj</artifactId>
+			<version>3.7.2</version>
+			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.antlr</groupId>
+			<artifactId>antlr-runtime</artifactId>
+			<version>3.3</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.rhsummit.jbw13</groupId>
+			<artifactId>vandelay-model</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	</dependencies>
+  
+  
 </project>

@@ -11,6 +11,7 @@ public class Product implements Serializable {
 	private Integer id;
 	private String name;
 	private BigDecimal price;
+	private double weightLbs;
 	
 	public Integer getId() {
 		return id;
@@ -30,6 +31,11 @@ public class Product implements Serializable {
 	public void setPrice(BigDecimal price) {
 		this.price = price;
 	}
-
+	public double getWeightLbs() {
+		return weightLbs;
+	}
+	public void setWeightLbs(double weightLbs) {
+		this.weightLbs = weightLbs;
+	}
 
 }
