@@ -15,7 +15,6 @@ import java.util.Date
 ############# Create Initial Values ###################
 # First, calculate the subtotal of the order
 	rule "Calculate Subtotal"
-	ruleflow-group "process-order"
 	dialect "mvel"
 	salience 150
 	no-loop true
