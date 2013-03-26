@@ -7,13 +7,15 @@ import org.drools.KnowledgeBaseFactory;
 import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.KnowledgeBuilderFactory;
 import org.drools.builder.ResourceType;
+import org.drools.common.DefaultAgenda;
 import org.drools.io.ResourceFactory;
-import org.drools.runtime.StatelessKnowledgeSession;
+import org.drools.runtime.StatefulKnowledgeSession;
+import org.drools.runtime.rule.impl.AgendaImpl;
 
 
 public class GenericDroolsCommand<T> implements Command<T> {
 	
-	private StatelessKnowledgeSession kSession;
+	private StatefulKnowledgeSession kSession;
 	private KnowledgeBuilder kBuilder;
 	
 	public GenericDroolsCommand(Map<String,ResourceType> resources)
@@ -27,20 +29,25 @@ public class GenericDroolsCommand<T> implements Command<T> {
 		
 		KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
 		kbase.addKnowledgePackages(kBuilder.getKnowledgePackages());	
-		
-		kSession = kbase.newStatelessKnowledgeSession();
+		kSession = kbase.newStatefulKnowledgeSession();
 
 	}
 	
 	public T execute(T object)
 	{
-		
-		kSession.execute(object);
+		AgendaImpl agenda = (AgendaImpl) kSession.getAgenda();
+		agenda.activateRuleFlowGroup("something");
+		System.out.println(agenda.getAgenda().getRuleFlowGroup("something").isActive());
+		kSession.insert(object);
+//		kSession.execute(object);
+		kSession.fireAllRules();
 		
 		if(kBuilder.hasErrors())
 		{
 		    System.out.println( kBuilder.getErrors().toString());
 		}
+		
+		kSession.dispose();
 		
 		
 		return object;

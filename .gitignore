@@ -1,7 +1,6 @@
 */target/**
-.project
-.settings
 .metadata
 .classpath
 .guvnorinfo
 .errai/
+*/classes
